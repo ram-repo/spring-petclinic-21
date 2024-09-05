@@ -39,7 +39,7 @@ jobs:
 
       # Build the project with Maven
       - name: Build with Maven
-        run: mvn clean install
+        run: mvn install
 
       # Run the tests and output the results
       - name: Run Maven tests
