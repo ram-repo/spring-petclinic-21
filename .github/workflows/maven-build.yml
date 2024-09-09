@@ -4,9 +4,9 @@ on:
   push:
     branches:
       - develop
-  pull_request:
-    branches:
-      - develop
+  # pull_request:
+  #   branches:
+  #     - develop
 
 jobs:
   build:
@@ -30,12 +30,12 @@ jobs:
 
       # Cache Maven dependencies to speed up builds
       - name: Cache Maven packages
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          key: ${{ runner.os }}-maven-dev
           restore-keys: |
-            ${{ runner.os }}-maven-
+            ${{ runner.os }}-maven-pub-sub
 
       # Build the project with Maven
       - name: Build with Maven
