@@ -20,7 +20,7 @@ steps:
           TAG="latest"
         fi
         echo "Tagging image as: $TAG"
-        echo $TAG > /workspace/tag.txt
+        echo $TAG > /workspace/tag.txt  # Store the tag in a text file
 
   # Step 2: Build the Docker image
   - name: 'gcr.io/cloud-builders/docker'
