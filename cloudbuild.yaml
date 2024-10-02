@@ -1,8 +1,6 @@
 options:
-  logging: CLOUD_LOGGING_ONLY 
-substitutions:
-  _TAG: ""
-
+  logging: CLOUD_LOGGING_ONLY
+  
 steps:
   # Step 1: Check the branch and generate the image tag dynamically
   - name: 'alpine'
