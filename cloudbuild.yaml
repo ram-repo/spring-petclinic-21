@@ -1,9 +1,6 @@
 options:
   logging: CLOUD_LOGGING_ONLY
-
-substitutions:
-  _TAG: "latest"  # Default value, will be overwritten in the first step
-
+  
 steps:
   # Step 1: Check the branch and generate the image tag dynamically
   - name: 'alpine'
@@ -23,16 +20,16 @@ steps:
           TAG="latest"
         fi
         echo "Tagging image as: $TAG"
-        echo "TAG=${TAG}" >> $envsubst
+        echo $TAG > /workspace/tag.txt
 
-  # Step 2: Build the Docker image using the generated tag
+  # Step 2: Build the Docker image
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', 'gcr.io/$PROJECT_ID/my-app:${_TAG}', '.']
-
+    args: ['build', '-t', 'gcr.io/$PROJECT_ID/my-app:$(cat /workspace/tag.txt)', '.']
+  
   # Step 3: Push the Docker image to GCR
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['push', 'gcr.io/$PROJECT_ID/my-app:${_TAG}']
+    args: ['push', 'gcr.io/$PROJECT_ID/my-app:$(cat /workspace/tag.txt)']
 
 images:
   # Push image to GCR with the dynamically generated tag
-  - 'gcr.io/$PROJECT_ID/my-app:${_TAG}'
+  - 'gcr.io/$PROJECT_ID/my-app:$(cat /workspace/tag.txt)'
