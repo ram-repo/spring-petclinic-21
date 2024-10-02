@@ -1,0 +1,35 @@
+substitutions:
+  _TAG: ""
+
+steps:
+  # Step 1: Check the branch and generate the image tag dynamically
+  - name: 'alpine'
+    entrypoint: '/bin/sh'
+    args:
+      - '-c'
+      - |
+        if [[ "$BRANCH_NAME" == "master" ]]; then
+          TAG="build-${BUILD_ID}"
+        elif [[ "$BRANCH_NAME" == feature/* ]]; then
+          TAG="${BRANCH_NAME/feature\//feature-}"
+        elif [[ "$BRANCH_NAME" == bugfix/* ]]; then
+          TAG="${BRANCH_NAME/bugfix\//bugfix-}"
+        elif [[ "$TAG_NAME" == release/* ]]; then
+          TAG="${TAG_NAME/release\//}"
+        else
+          TAG="latest"
+        fi
+        echo "Tagging image as: $TAG"
+        echo "{\"tag\":\"$TAG\"}" > /workspace/tag.json
+
+  # Step 2: Build the Docker image
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'gcr.io/$PROJECT_ID/my-app:$(cat /workspace/tag.json | jq -r .tag)', '.']
+  
+  # Step 3: Push the Docker image to GCR
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/$PROJECT_ID/my-app:$(cat /workspace/tag.json | jq -r .tag)']
+
+images:
+  # Push image to GCR with the dynamically generated tag
+  - 'gcr.io/$PROJECT_ID/my-app:$(cat /workspace/tag.json | jq -r .tag)'
